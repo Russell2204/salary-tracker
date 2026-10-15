@@ -109,12 +109,40 @@ h2 {
   font-size: 0.85rem;
 }
 
-.theme-toggle {
+.theme-toggle,
+.lang-btn {
   height: 42px;
   color: var(--ink);
   background: var(--card);
   border: 1px solid var(--line);
   white-space: nowrap;
+}
+
+.lang-switch {
+  display: flex;
+}
+
+.lang-btn {
+  min-width: 48px;
+  padding-inline: 12px;
+}
+
+.lang-btn + .lang-btn {
+  margin-left: -1px;
+}
+
+.lang-btn:first-child {
+  border-radius: 10px 0 0 10px;
+}
+
+.lang-btn:last-child {
+  border-radius: 0 10px 10px 0;
+}
+
+.lang-btn[aria-pressed="true"] {
+  color: var(--on-accent);
+  background: var(--accent);
+  border-color: var(--accent);
 }
 
 .tabs {

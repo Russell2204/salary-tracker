@@ -15,38 +15,42 @@
   <div class="page">
     <header class="header">
       <div>
-        <p class="eyebrow">Личные финансы</p>
-        <h1>Трекер доходов и расходов</h1>
+        <p class="eyebrow" data-i18n="eyebrow">Личные финансы</p>
+        <h1 data-i18n="title">Трекер доходов и расходов</h1>
       </div>
       <div class="header-tools">
         <label class="period">
-          <span>Период</span>
+          <span data-i18n="period">Период</span>
           <select id="period"></select>
         </label>
+        <div class="lang-switch" role="group" data-i18n-aria="language">
+          <button type="button" class="lang-btn" data-lang="ru" aria-pressed="true">RU</button>
+          <button type="button" class="lang-btn" data-lang="uz" aria-pressed="false">UZ</button>
+        </div>
         <button type="button" id="theme-toggle" class="theme-toggle" aria-pressed="false">Тёмная</button>
       </div>
     </header>
 
-    <div class="tabs" role="tablist" aria-label="Разделы">
-      <button type="button" class="tab" role="tab" id="tab-stats" data-tab="stats" aria-controls="panel-stats" aria-selected="true">Итоги</button>
-      <button type="button" class="tab" role="tab" id="tab-charts" data-tab="charts" aria-controls="panel-charts" aria-selected="false">Графики</button>
-      <button type="button" class="tab" role="tab" id="tab-form" data-tab="form" aria-controls="panel-form" aria-selected="false">Операция</button>
-      <button type="button" class="tab" role="tab" id="tab-list" data-tab="list" aria-controls="panel-list" aria-selected="false">Список</button>
+    <div class="tabs" role="tablist" data-i18n-aria="sections">
+      <button type="button" class="tab" role="tab" id="tab-stats" data-tab="stats" aria-controls="panel-stats" aria-selected="true" data-i18n="tabStats">Итоги</button>
+      <button type="button" class="tab" role="tab" id="tab-charts" data-tab="charts" aria-controls="panel-charts" aria-selected="false" data-i18n="tabCharts">Графики</button>
+      <button type="button" class="tab" role="tab" id="tab-form" data-tab="form" aria-controls="panel-form" aria-selected="false" data-i18n="tabForm">Операция</button>
+      <button type="button" class="tab" role="tab" id="tab-list" data-tab="list" aria-controls="panel-list" aria-selected="false" data-i18n="tabList">Список</button>
     </div>
 
     <div class="tab-stage">
       <section class="tab-panel is-active" id="panel-stats" data-panel="stats" role="tabpanel" aria-labelledby="tab-stats" aria-hidden="false">
-        <div class="stats" aria-label="Итоги периода">
+        <div class="stats" data-i18n-aria="periodTotals">
           <article class="stat stat-income">
-            <p class="stat-label">Доходы</p>
+            <p class="stat-label" data-i18n="incomePlural">Доходы</p>
             <p class="stat-value" id="total-income">0 ₽</p>
           </article>
           <article class="stat stat-expense">
-            <p class="stat-label">Расходы</p>
+            <p class="stat-label" data-i18n="expensePlural">Расходы</p>
             <p class="stat-value" id="total-expense">0 ₽</p>
           </article>
           <article class="stat stat-balance">
-            <p class="stat-label">Баланс</p>
+            <p class="stat-label" data-i18n="balance">Баланс</p>
             <p class="stat-value" id="balance">0 ₽</p>
           </article>
         </div>
@@ -55,16 +59,16 @@
       <section class="tab-panel" id="panel-charts" data-panel="charts" role="tabpanel" aria-labelledby="tab-charts" aria-hidden="true">
         <div class="charts">
           <article class="panel">
-            <h2 id="bar-title">Доходы и расходы по дням</h2>
+            <h2 id="bar-title" data-i18n="barByDay">Доходы и расходы по дням</h2>
             <div class="chart-wrap">
-              <canvas id="bar-chart" aria-label="Столбчатая диаграмма доходов и расходов"></canvas>
+              <canvas id="bar-chart" data-i18n-aria="barChart"></canvas>
             </div>
           </article>
           <article class="panel">
-            <h2>Расходы по категориям</h2>
+            <h2 data-i18n="byCategory">Расходы по категориям</h2>
             <div class="chart-wrap chart-wrap-doughnut">
-              <canvas id="doughnut-chart" aria-label="Расходы по категориям"></canvas>
-              <p class="empty-chart" id="doughnut-empty" hidden>Нет данных</p>
+              <canvas id="doughnut-chart" data-i18n-aria="byCategory"></canvas>
+              <p class="empty-chart" id="doughnut-empty" data-i18n="noData" hidden>Нет данных</p>
             </div>
           </article>
         </div>
@@ -76,27 +80,27 @@
           <form id="transaction-form" novalidate>
             <div class="fields">
               <label>
-                Тип
+                <span data-i18n="type">Тип</span>
                 <select id="type" name="type" required>
-                  <option value="income">Доход</option>
-                  <option value="expense">Расход</option>
+                  <option value="income" data-i18n="income">Доход</option>
+                  <option value="expense" data-i18n="expense">Расход</option>
                 </select>
               </label>
               <label>
-                Сумма, ₽
+                <span data-i18n="amount">Сумма, ₽</span>
                 <input id="amount" name="amount" type="number" min="0.01" step="0.01" required>
               </label>
               <label>
-                Категория
+                <span data-i18n="category">Категория</span>
                 <select id="category" name="category" required></select>
               </label>
               <label>
-                Дата
+                <span data-i18n="date">Дата</span>
                 <input id="date" name="date" type="date" required>
               </label>
               <label class="field-wide">
-                Комментарий
-                <input id="note" name="note" type="text" maxlength="120" placeholder="Необязательно">
+                <span data-i18n="note">Комментарий</span>
+                <input id="note" name="note" type="text" maxlength="120" data-i18n-placeholder="optional" placeholder="Необязательно">
               </label>
             </div>
             <p class="form-error" id="form-error" hidden></p>
@@ -110,22 +114,22 @@
 
       <section class="tab-panel" id="panel-list" data-panel="list" role="tabpanel" aria-labelledby="tab-list" aria-hidden="true">
         <article class="panel">
-          <h2>Операции</h2>
+          <h2 data-i18n="operations">Операции</h2>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Дата</th>
-                  <th>Тип</th>
-                  <th>Категория</th>
-                  <th>Комментарий</th>
-                  <th class="num">Сумма</th>
+                <th data-i18n="date">Дата</th>
+                <th data-i18n="type">Тип</th>
+                <th data-i18n="category">Категория</th>
+                <th data-i18n="note">Комментарий</th>
+                <th class="num" data-i18n="amount">Сумма, ₽</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody id="transactions"></tbody>
             </table>
-            <p class="empty-list" id="empty-list" hidden>За выбранный период операций нет</p>
+            <p class="empty-list" id="empty-list" data-i18n="emptyList" hidden>За выбранный период операций нет</p>
           </div>
         </article>
       </section>
