@@ -71,7 +71,7 @@ const Charts = {
     this.clear(canvas);
 
     if (!series.length) {
-      this._empty(ctx, w, h, "Нет данных для графика");
+      this._empty(ctx, w, h, I18n.t("chart.noData"));
       return;
     }
 
@@ -153,11 +153,12 @@ const Charts = {
     ctx.font = "12px Segoe UI, sans-serif";
     ctx.textAlign = "left";
     ctx.textBaseline = "middle";
-    ctx.fillText("Доход", pad.left + 20, 14);
+    ctx.fillText(I18n.t("chart.income"), pad.left + 20, 14);
 
-    this._drawLegendCube(ctx, pad.left + 78, 8, theme.expense);
+    const expenseLabelX = pad.left + 20 + ctx.measureText(I18n.t("chart.income")).width + 24;
+    this._drawLegendCube(ctx, expenseLabelX, 8, theme.expense);
     ctx.fillStyle = theme.muted;
-    ctx.fillText("Расход", pad.left + 98, 14);
+    ctx.fillText(I18n.t("chart.expense"), expenseLabelX + 20, 14);
   },
 
   _draw3DBar(ctx, x, y, width, height, depth, color) {
@@ -258,7 +259,7 @@ const Charts = {
     if (legendEl) legendEl.innerHTML = "";
 
     if (!slices.length) {
-      this._empty(ctx, w, h, "Нет расходов за период");
+      this._empty(ctx, w, h, I18n.t("chart.noExpenses"));
       return;
     }
 

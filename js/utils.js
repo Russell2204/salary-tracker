@@ -9,7 +9,7 @@ const Utils = {
       .toString()
       .replace(/\B(?=(\d{3})+(?!\d))/g, " ");
     const sign = n < 0 ? "−" : "";
-    return `${sign}${formatted} сум`;
+    return `${sign}${formatted} ${I18n.t("currency")}`;
   },
 
   formatDate(isoDate) {
@@ -27,7 +27,7 @@ const Utils = {
   },
 
   typeLabel(type) {
-    return type === "income" ? "Доход" : "Расход";
+    return type === "income" ? I18n.t("type.income") : I18n.t("type.expense");
   },
 
   monthKey(isoDate) {
@@ -36,11 +36,7 @@ const Utils = {
 
   monthLabel(monthKey) {
     const [y, m] = monthKey.split("-");
-    const names = [
-      "янв", "фев", "мар", "апр", "май", "июн",
-      "июл", "авг", "сен", "окт", "ноя", "дек",
-    ];
-    return `${names[Number(m) - 1]} ${y}`;
+    return `${I18n.t(`month.${Number(m) - 1}`)} ${y}`;
   },
 
   isInPeriod(isoDate, period) {
@@ -55,5 +51,20 @@ const Utils = {
       return isoDate.startsWith(String(y));
     }
     return true;
+  },
+
+  err(key, vars) {
+    const error = new Error(key);
+    error.i18nKey = key;
+    error.i18nVars = vars || {};
+    return error;
+  },
+
+  errMessage(err) {
+    if (err && err.i18nKey) return I18n.t(err.i18nKey, err.i18nVars);
+    if (err && err.message && I18n.dictionaries.ru[err.message]) {
+      return I18n.t(err.message);
+    }
+    return (err && err.message) || String(err);
   },
 };

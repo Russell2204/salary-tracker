@@ -1,7 +1,9 @@
 const App = {
   init() {
+    I18n.init();
     Storage.seedIfNeeded();
     this.initTheme();
+    this.initLang();
     this.bindTabs();
     this.bindDashboard();
     this.bindTransactionsUI();
@@ -34,16 +36,33 @@ const App = {
   applyTheme(theme, redraw) {
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("st_theme", theme);
+    this.updateThemeLabel(theme);
+    if (redraw) this.renderDashboard();
+  },
+
+  updateThemeLabel(theme) {
+    const current = theme || document.documentElement.getAttribute("data-theme") || "light";
     const label = document.getElementById("theme-toggle-label");
-    if (label) label.textContent = theme === "dark" ? "Светлая" : "Тёмная";
+    if (label) {
+      label.textContent = current === "dark" ? I18n.t("theme.light") : I18n.t("theme.dark");
+    }
     const btn = document.getElementById("theme-toggle");
     if (btn) {
       btn.setAttribute(
         "aria-label",
-        theme === "dark" ? "Включить светлую тему" : "Включить тёмную тему"
+        current === "dark" ? I18n.t("theme.toLight") : I18n.t("theme.toDark")
       );
+      btn.setAttribute("title", I18n.t("theme.title"));
     }
-    if (redraw) this.renderDashboard();
+  },
+
+  /* ----- Language ----- */
+  initLang() {
+    document.getElementById("lang-toggle").addEventListener("click", () => {
+      I18n.toggle();
+      this.updateThemeLabel();
+      this.refreshAll();
+    });
   },
 
   /* ----- Tabs ----- */
@@ -96,8 +115,7 @@ const App = {
     const recent = Transactions.getAll().slice(0, 5);
     const tbody = document.getElementById("recent-transactions");
     if (!recent.length) {
-      tbody.innerHTML =
-        '<tr><td colspan="5" style="text-align:center;color:var(--text-muted)">Пока нет транзакций</td></tr>';
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-muted)">${I18n.t("recent.empty")}</td></tr>`;
       return;
     }
     tbody.innerHTML = recent.map((t) => this.transactionRowHtml(t, false)).join("");
@@ -136,7 +154,7 @@ const App = {
         modal.close();
         this.refreshAll();
       } catch (err) {
-        alert(err.message);
+        alert(Utils.errMessage(err));
       }
     });
 
@@ -169,12 +187,12 @@ const App = {
         if (tx) this.openTransactionModal(tx);
       }
       if (btn.dataset.action === "delete") {
-        if (!confirm("Удалить эту транзакцию?")) return;
+        if (!confirm(I18n.t("confirm.deleteTx"))) return;
         try {
           Transactions.remove(id);
           this.refreshAll();
         } catch (err) {
-          alert(err.message);
+          alert(Utils.errMessage(err));
         }
       }
     });
@@ -183,8 +201,8 @@ const App = {
   openTransactionModal(tx = null) {
     const modal = document.getElementById("modal-transaction");
     document.getElementById("modal-transaction-title").textContent = tx
-      ? "Редактировать транзакцию"
-      : "Новая транзакция";
+      ? I18n.t("modal.tx.edit")
+      : I18n.t("modal.tx.new");
     document.getElementById("tx-id").value = tx ? tx.id : "";
     document.getElementById("tx-type").value = tx ? tx.type : "expense";
     document.getElementById("tx-amount").value = tx ? tx.amount : "";
@@ -201,13 +219,13 @@ const App = {
     const select = document.getElementById("tx-category");
     const cats = Categories.getByType(type);
     if (!cats.length) {
-      select.innerHTML = '<option value="">Нет категорий</option>';
+      select.innerHTML = `<option value="">${I18n.t("select.noCategories")}</option>`;
       return;
     }
     select.innerHTML = cats
       .map(
         (c) =>
-          `<option value="${c.id}" ${c.id === selectedId ? "selected" : ""}>${c.name}</option>`
+          `<option value="${c.id}" ${c.id === selectedId ? "selected" : ""}>${I18n.categoryName(c)}</option>`
       )
       .join("");
   },
@@ -220,8 +238,10 @@ const App = {
       type === "all" ? Categories.getAll() : Categories.getByType(type);
 
     select.innerHTML =
-      '<option value="all">Все</option>' +
-      cats.map((c) => `<option value="${c.id}">${c.name}</option>`).join("");
+      `<option value="all">${I18n.t("filter.all")}</option>` +
+      cats
+        .map((c) => `<option value="${c.id}">${I18n.categoryName(c)}</option>`)
+        .join("");
 
     if ([...select.options].some((o) => o.value === prev)) {
       select.value = prev;
@@ -253,15 +273,15 @@ const App = {
   transactionRowHtml(t, withActions) {
     const cat = Categories.getById(t.categoryId);
     const catName = cat
-      ? `<span class="cat-dot" style="background:${cat.color}"></span>${cat.name}`
+      ? `<span class="cat-dot" style="background:${cat.color}"></span>${I18n.categoryName(cat)}`
       : "—";
     const amountClass = t.type === "income" ? "amount--income" : "amount--expense";
     const prefix = t.type === "income" ? "+" : "−";
     const actions = withActions
       ? `<td>
           <div class="btn-row">
-            <button type="button" class="btn btn--ghost btn--sm" data-action="edit" data-id="${t.id}">Изменить</button>
-            <button type="button" class="btn btn--danger btn--sm" data-action="delete" data-id="${t.id}">Удалить</button>
+            <button type="button" class="btn btn--ghost btn--sm" data-action="edit" data-id="${t.id}">${I18n.t("btn.edit")}</button>
+            <button type="button" class="btn btn--danger btn--sm" data-action="delete" data-id="${t.id}">${I18n.t("btn.delete")}</button>
           </div>
         </td>`
       : "";
@@ -308,7 +328,7 @@ const App = {
         modal.close();
         this.refreshAll();
       } catch (err) {
-        alert(err.message);
+        alert(Utils.errMessage(err));
       }
     });
 
@@ -321,12 +341,12 @@ const App = {
         if (cat) this.openCategoryModal(cat);
       }
       if (btn.dataset.action === "delete") {
-        if (!confirm("Удалить эту категорию?")) return;
+        if (!confirm(I18n.t("confirm.deleteCat"))) return;
         try {
           Categories.remove(id);
           this.refreshAll();
         } catch (err) {
-          alert(err.message);
+          alert(Utils.errMessage(err));
         }
       }
     });
@@ -335,10 +355,10 @@ const App = {
   openCategoryModal(cat = null) {
     const modal = document.getElementById("modal-category");
     document.getElementById("modal-category-title").textContent = cat
-      ? "Редактировать категорию"
-      : "Новая категория";
+      ? I18n.t("modal.cat.edit")
+      : I18n.t("modal.cat.new");
     document.getElementById("cat-id").value = cat ? cat.id : "";
-    document.getElementById("cat-name").value = cat ? cat.name : "";
+    document.getElementById("cat-name").value = cat ? I18n.categoryName(cat) : "";
     document.getElementById("cat-type").value = cat ? cat.type : "expense";
     document.getElementById("cat-color").value = cat ? cat.color : "#2a9d8f";
     document.getElementById("cat-type").disabled = false;
@@ -365,12 +385,12 @@ const App = {
         <article class="category-card">
           <div class="category-card__color" style="background:${c.color}"></div>
           <div class="category-card__info">
-            <p class="category-card__name">${c.name}</p>
+            <p class="category-card__name">${I18n.categoryName(c)}</p>
             <p class="category-card__type">${Utils.typeLabel(c.type)}</p>
           </div>
           <div class="btn-row">
-            <button type="button" class="btn btn--ghost btn--sm" data-action="edit" data-id="${c.id}">Изменить</button>
-            <button type="button" class="btn btn--danger btn--sm" data-action="delete" data-id="${c.id}">Удалить</button>
+            <button type="button" class="btn btn--ghost btn--sm" data-action="edit" data-id="${c.id}">${I18n.t("btn.edit")}</button>
+            <button type="button" class="btn btn--danger btn--sm" data-action="delete" data-id="${c.id}">${I18n.t("btn.delete")}</button>
           </div>
         </article>`
       )

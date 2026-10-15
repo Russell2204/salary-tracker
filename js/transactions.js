@@ -24,9 +24,9 @@ const Transactions = {
     this._validate({ type, amount, categoryId, date });
 
     const category = Categories.getById(categoryId);
-    if (!category) throw new Error("Категория не найдена");
+    if (!category) throw Utils.err("err.categoryNotFound");
     if (category.type !== type) {
-      throw new Error("Тип категории не совпадает с типом транзакции");
+      throw Utils.err("err.typeMismatch");
     }
 
     const transaction = {
@@ -49,12 +49,12 @@ const Transactions = {
 
     const list = Storage.getTransactions();
     const index = list.findIndex((t) => t.id === id);
-    if (index === -1) throw new Error("Транзакция не найдена");
+    if (index === -1) throw Utils.err("err.transactionNotFound");
 
     const category = Categories.getById(categoryId);
-    if (!category) throw new Error("Категория не найдена");
+    if (!category) throw Utils.err("err.categoryNotFound");
     if (category.type !== type) {
-      throw new Error("Тип категории не совпадает с типом транзакции");
+      throw Utils.err("err.typeMismatch");
     }
 
     list[index] = {
@@ -72,7 +72,7 @@ const Transactions = {
   remove(id) {
     const list = Storage.getTransactions();
     const next = list.filter((t) => t.id !== id);
-    if (next.length === list.length) throw new Error("Транзакция не найдена");
+    if (next.length === list.length) throw Utils.err("err.transactionNotFound");
     Storage.setTransactions(next);
   },
 
@@ -120,7 +120,7 @@ const Transactions = {
         const cat = Categories.getById(categoryId);
         return {
           categoryId,
-          name: cat ? cat.name : "Удалена",
+          name: cat ? I18n.categoryName(cat) : I18n.t("deleted"),
           color: cat ? cat.color : "#999999",
           amount,
         };
@@ -130,15 +130,15 @@ const Transactions = {
 
   _validate({ type, amount, categoryId, date }) {
     if (type !== "income" && type !== "expense") {
-      throw new Error("Некорректный тип транзакции");
+      throw Utils.err("err.invalidTxType");
     }
     const value = Number(amount);
     if (!Number.isFinite(value) || value < 1) {
-      throw new Error("Сумма должна быть больше 0");
+      throw Utils.err("err.amountPositive");
     }
-    if (!categoryId) throw new Error("Выберите категорию");
+    if (!categoryId) throw Utils.err("err.selectCategory");
     if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-      throw new Error("Укажите корректную дату");
+      throw Utils.err("err.invalidDate");
     }
   },
 };
