@@ -58,11 +58,21 @@ const App = {
 
   /* ----- Language ----- */
   initLang() {
-    document.getElementById("lang-toggle").addEventListener("click", () => {
+    const btn = document.getElementById("lang-toggle");
+    let lastTap = 0;
+    const switchLang = (e) => {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      const now = Date.now();
+      if (now - lastTap < 400) return;
+      lastTap = now;
       I18n.toggle();
       this.updateThemeLabel();
       this.refreshAll();
-    });
+    };
+    btn.addEventListener("pointerup", switchLang);
   },
 
   /* ----- Tabs ----- */

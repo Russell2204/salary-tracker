@@ -148,6 +148,8 @@ body {
 
 /* Header */
 .header {
+  position: relative;
+  z-index: 50;
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
@@ -157,6 +159,8 @@ body {
 }
 
 .header__controls {
+  position: relative;
+  z-index: 51;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -164,8 +168,11 @@ body {
 }
 
 .theme-toggle {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.4rem;
   font: inherit;
   font-size: 0.85rem;
@@ -174,17 +181,27 @@ body {
   background: var(--surface);
   border: 1px solid var(--border-strong);
   border-radius: 999px;
-  padding: 0.45rem 0.95rem;
+  padding: 0.55rem 0.95rem;
+  min-height: 44px;
   cursor: pointer;
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
   box-shadow: var(--glass-shadow);
-  transition: background 0.2s, border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.theme-toggle > * {
+  pointer-events: none;
 }
 
 .theme-toggle:hover {
   background: var(--ghost-hover);
-  transform: translateY(-1px);
+}
+
+.theme-toggle:active {
+  background: var(--ghost-hover);
 }
 
 .theme-toggle__icon {
@@ -830,24 +847,30 @@ body {
   }
 
   .header__controls {
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .header__controls .tabs {
+    grid-column: 1 / -1;
+    width: 100%;
+    justify-content: stretch;
   }
 
   .theme-toggle {
-    justify-content: center;
-  }
-
-  .tabs {
     width: 100%;
-    justify-content: stretch;
+    justify-content: center;
   }
 
   .tabs__btn {
     flex: 1;
     text-align: center;
-    padding: 0.5rem 0.6rem;
+    padding: 0.55rem 0.5rem;
     font-size: 0.8rem;
+    min-height: 44px;
+    touch-action: manipulation;
   }
 }
 
